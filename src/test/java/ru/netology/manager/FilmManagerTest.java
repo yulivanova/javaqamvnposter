@@ -1,10 +1,18 @@
 package ru.netology.manager;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import ru.netology.repository.FilmRepository;
 import ru.netology.domain.FilmItem;
 
+import static org.mockito.Mockito.*;
+
 class FilmManagerTest {
+
+    FilmRepository repo = Mockito.mock(FilmRepository.class);
+    FilmManager manager = new FilmManager(repo);
 
     FilmItem film1 = new FilmItem(1, 11, "Бладшот");
     FilmItem film2 = new FilmItem(2, 22, "Вперед");
@@ -18,10 +26,8 @@ class FilmManagerTest {
     FilmItem film10 = new FilmItem(10, 100, "Пианист");
     FilmItem film11 = new FilmItem(11, 111, "<Большой Куш>");
 
-    @Test
-    void shouldFindAll() {
-        FilmManager manager = new FilmManager();
-
+    @BeforeEach
+    public void setUp() {
         manager.add(film1);
         manager.add(film2);
         manager.add(film3);
@@ -33,96 +39,24 @@ class FilmManagerTest {
         manager.add(film9);
         manager.add(film10);
         manager.add(film11);
-
-        FilmItem[] actual = manager.findAll();
-        FilmItem[] expected = {film1, film2, film3, film4, film5, film6, film7, film8, film9, film10, film11};
-
-        Assertions.assertArrayEquals(actual, expected);
     }
 
     @Test
-    void shouldGetAll() {
-    }
+    public void shouldLastRemove() {
 
-    @Test
-    void shouldFindLast() {
-        FilmManager manager = new FilmManager();
+        FilmItem[] items = new FilmItem[]{film1, film2, film4, film5, film6, film7, film8, film9, film10, film11};
 
-        manager.add(film1);
-        manager.add(film2);
-        manager.add(film3);
-        manager.add(film4);
-        manager.add(film5);
-        manager.add(film6);
-        manager.add(film7);
-        manager.add(film8);
-        manager.add(film9);
-        manager.add(film10);
-        manager.add(film11);
+        manager.removeById(film3.getId());
 
-        FilmItem[] actual = manager.findLast();
-        FilmItem[] expected = {film11, film10, film9, film8, film7, film6, film5, film4, film3, film2};
+        doReturn(items).when(repo).findAll();
+        doNothing().when(repo).removeById(film3.getId());
 
-        Assertions.assertArrayEquals(actual, expected);
-    }
+        FilmItem[] expected = new FilmItem[]{film11, film10, film9, film8, film7, film6, film5, film4, film2, film1};
+        FilmItem[] actual = manager.getAll();
+        Assertions.assertArrayEquals(expected, actual);
 
-    @Test
-    void shouldFindLast1() {
-        FilmManager manager = new FilmManager();
-
-        manager.add(film5);
-
-        FilmItem[] actual = manager.findLast();
-        FilmItem[] expected = {film5};
-
-        Assertions.assertArrayEquals(actual, expected);
-    }
-
-    @Test
-    void shouldFindLast3() {
-        FilmManager manager = new FilmManager();
-
-        manager.add(film1);
-        manager.add(film2);
-        manager.add(film3);
-        manager.add(film4);
-        manager.add(film5);
-
-
-        FilmItem[] actual = manager.findLast();
-        FilmItem[] expected = {film5, film4, film3, film2, film1};
-
-        Assertions.assertArrayEquals(actual, expected);
-    }
-
-    @Test
-    void shouldFindLast4() {
-        FilmManager manager = new FilmManager();
-
-        FilmItem[] actual = manager.findLast();
-        FilmItem[] expected = {};
-
-        Assertions.assertArrayEquals(actual, expected);
-    }
-
-    @Test
-    void shouldFindLast5() {
-        FilmManager manager = new FilmManager();
-
-        manager.add(film1);
-        manager.add(film2);
-        manager.add(film3);
-        manager.add(film4);
-        manager.add(film5);
-        manager.add(film6);
-        manager.add(film7);
-        manager.add(film8);
-        manager.add(film9);
-        manager.add(film10);
-
-        FilmItem[] actual = manager.findLast();
-        FilmItem[] expected = {film10, film9, film8, film7, film6, film5, film4, film3, film2, film1};
-
-        Assertions.assertArrayEquals(actual, expected);
+        verify(repo).removeById(film3.getId());
     }
 }
+
+
